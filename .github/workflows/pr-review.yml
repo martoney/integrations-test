@@ -14,7 +14,8 @@ on:
 jobs:
   review:
     if: >-
-      (github.event_name == 'pull_request_target' && !github.event.pull_request.draft) ||
+      (github.event_name == 'pull_request_target' && !github.event.pull_request.draft &&
+       github.event.pull_request.user.login != 'dependabot[bot]') ||
       (github.event.issue.pull_request &&
        startsWith(github.event.comment.body, '@shelly-plc-bot review') &&
        contains(fromJSON('["OWNER","MEMBER","COLLABORATOR"]'), github.event.comment.author_association))

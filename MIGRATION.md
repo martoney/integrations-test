@@ -66,8 +66,10 @@ page" link to the GitHub editor.
 
 OpenChamber has three layers, and so does this repo.
 
-**Identity: a GitHub App.** Every bot workflow starts with
-`actions/create-github-app-token`. It swaps the App's private key for a
+**Identity: a GitHub App.** Each AI bot workflow starts with
+`actions/create-github-app-token`. The deterministic label workflows use the
+built-in `GITHUB_TOKEN` instead, so they also work on Dependabot PRs, which
+never receive regular secrets. The AI review skips Dependabot PRs. It swaps the App's private key for a
 short-lived token, so comments and labels come from `shelly-plc-bot[bot]`
 instead of `github-actions[bot]`. Each workflow asks only for the permissions
 it needs (`permission-issues: write`, ...). That limits the damage if a
