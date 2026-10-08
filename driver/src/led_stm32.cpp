@@ -16,7 +16,7 @@ void setStatusLed(bool on) {
     pinMode(LED_BUILTIN, OUTPUT);
     configured = true;
   }
-  digitalWrite(LED_BUILTIN, on ? HIGH : LOW);
+  digitalWriteFast(digitalPinToPinName(LED_BUILTIN), on ? HIGH : LOW);
 }
 
 } // namespace PLCDummy
