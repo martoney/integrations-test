@@ -1,0 +1,89 @@
+name: Bug report
+description: Something in the SDK, its tools or examples is broken or behaves differently than documented.
+title: "[Bug] "
+labels: [bug]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        This form is for bugs. Feature ideas go to [Ideas discussions](../discussions/categories/ideas), questions to [Q&A discussions](../discussions/categories/q-a). Security problems go to [private vulnerability reporting](../security/advisories/new), never to a public issue.
+
+        Please write in English. Machine translation is fine.
+
+  - type: checkboxes
+    id: checks
+    attributes:
+      label: Before submitting
+      options:
+        - label: I searched existing issues and didn't find this bug
+          required: true
+        - label: This is one bug. Other problems get their own issue.
+          required: true
+
+  - type: textarea
+    id: steps
+    attributes:
+      label: Steps to reproduce
+      description: What you did, step by step. If it only happens sometimes, say how often.
+    validations:
+      required: true
+
+  - type: textarea
+    id: expected
+    attributes:
+      label: What you expected
+    validations:
+      required: true
+
+  - type: textarea
+    id: actual
+    attributes:
+      label: What happened instead
+    validations:
+      required: true
+
+  - type: textarea
+    id: sketch
+    attributes:
+      label: Minimal sketch
+      description: The smallest program that shows the problem. Remove everything unrelated.
+      render: cpp
+
+  - type: input
+    id: sdk-version
+    attributes:
+      label: SDK version
+      description: Release tag or commit from your platformio.ini.
+      placeholder: "e.g. v1.2.0 or 3f2a1bc"
+    validations:
+      required: true
+
+  - type: input
+    id: host-version
+    attributes:
+      label: Shelly Host firmware version
+      placeholder: "e.g. 1.6.0"
+
+  - type: input
+    id: board-revision
+    attributes:
+      label: Board revision
+      placeholder: "e.g. 1.0"
+
+  - type: dropdown
+    id: upload
+    attributes:
+      label: Upload method
+      options:
+        - Network through the Shelly Host (shelly-rpc)
+        - ST-Link
+        - Not relevant
+    validations:
+      required: true
+
+  - type: textarea
+    id: logs
+    attributes:
+      label: Logs (optional)
+      description: Build output, upload output or serial logs. Remove passwords and anything personal.
+      render: shell

@@ -1,0 +1,11 @@
+blank_issues_enabled: false
+contact_links:
+  - name: Feature request or idea
+    url: https://github.com/martoney/integrations-test/discussions/categories/ideas
+    about: New features and behaviour changes start as an Ideas discussion, not an issue.
+  - name: Question or help
+    url: https://github.com/martoney/integrations-test/discussions/categories/q-a
+    about: Setup problems, "how do I", and "is this expected" go to Q&A.
+  - name: Security vulnerability
+    url: https://github.com/martoney/integrations-test/security/advisories/new
+    about: Report privately. Never open a public issue for a vulnerability.

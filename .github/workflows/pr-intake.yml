@@ -1,0 +1,85 @@
+name: pr-intake
+
+# Deterministic PR labels: area and needs-hardware-proof by path, size by
+# changed lines, and needs-discussion parking for large outside PRs with no
+# Ideas discussion linked. No AI, no PR code is checked out or executed.
+
+on:
+  pull_request_target:
+    types: [opened, reopened, synchronize, edited, ready_for_review]
+
+permissions:
+  contents: read
+  pull-requests: write
+  issues: write
+
+concurrency:
+  group: pr-intake-${{ github.event.pull_request.number }}
+  cancel-in-progress: true
+
+jobs:
+  label:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/labeler@bf12e9b00b37c5c0ca2b87b79b2daf7891dbda13 # v7.0.0
+        with:
+          sync-labels: true
+
+      - id: app-token
+        uses: actions/create-github-app-token@bcd2ba49218906704ab6c1aa796996da409d3eb1 # v3.2.0
+        with:
+          app-id: ${{ vars.BOT_APP_ID }}
+          private-key: ${{ secrets.BOT_PRIVATE_KEY }}
+          permission-issues: write
+          permission-pull-requests: write
+
+      - uses: actions/github-script@3a2844b7e9c422d3c10d287c895573f7108da1b3 # v9.0.0
+        with:
+          github-token: ${{ steps.app-token.outputs.token }}
+          script: |
+            const { owner, repo } = context.repo;
+            const pr = context.payload.pull_request;
+            const issue_number = pr.number;
+
+            const excluded = /(^|\/)tests?\/|package-lock\.json$|\.(png|jpe?g|gif|svg)$/;
+            const files = await github.paginate(github.rest.pulls.listFiles, { owner, repo, pull_number: issue_number, per_page: 100 });
+            const counted = files.filter((f) => !excluded.test(f.filename));
+            const lines = (counted.length ? counted : files).reduce((n, f) => n + f.additions + f.deletions, 0);
+            const size = lines < 10 ? "XS" : lines < 30 ? "S" : lines < 100 ? "M" : lines < 500 ? "L" : lines < 1000 ? "XL" : "XXL";
+
+            const { data: current } = await github.rest.issues.listLabelsOnIssue({ owner, repo, issue_number });
+            const names = current.map((l) => l.name);
+
+            const isTeam = ["OWNER", "MEMBER", "COLLABORATOR"].includes(pr.author_association);
+            const hasDiscussion = new RegExp(`github\\.com/${owner}/${repo}/discussions/\\d+`, "i").test(pr.body ?? "");
+            const exempt = names.some((n) => ["pinned", "help wanted", "security"].includes(n));
+            const parkingApplies = !isTeam && (size === "XL" || size === "XXL") && !hasDiscussion && !pr.draft && !exempt;
+
+            // Post the parking comment once. If a maintainer removed the label afterwards, respect that.
+            const marker = "<!-- pr-intake:needs-discussion -->";
+            const comments = parkingApplies ? await github.paginate(github.rest.issues.listComments, { owner, repo, issue_number, per_page: 100 }) : [];
+            const alreadyPosted = comments.some((c) => (c.body ?? "").includes(marker));
+            const parked = names.includes("needs-discussion");
+            const park = parkingApplies && (parked || !alreadyPosted);
+
+            const wanted = new Set([`size:${size}`, ...(park ? ["needs-discussion"] : [])]);
+            for (const name of names) {
+              if ((name.startsWith("size:") || name === "needs-discussion") && !wanted.has(name)) {
+                await github.rest.issues.removeLabel({ owner, repo, issue_number, name });
+              }
+            }
+            const add = [...wanted].filter((n) => !names.includes(n));
+            if (add.length) await github.rest.issues.addLabels({ owner, repo, issue_number, labels: add });
+
+            if (park && !alreadyPosted) {
+              await github.rest.issues.createComment({ owner, repo, issue_number, body: [
+                marker,
+                `Thanks for the PR. It is large (size:${size}, about ${lines} changed lines excluding tests, lockfiles and images), so it is parked with \`needs-discussion\` instead of being reviewed as-is.`,
+                "",
+                `A change this size almost always carries a design decision that is easier to settle in words than inside a diff. Please open an [Ideas discussion](https://github.com/${owner}/${repo}/discussions/categories/ideas) describing the problem and the proposed shape, then link it in this PR's description. The label comes off on the next push or edit.`,
+                "",
+                "If the diff is mostly mechanical (generated files, a rename), say so here and a maintainer will look anyway. Nothing closes because of this label; the usual stale rule still applies.",
+              ].join("\n") });
+            }
+
+            core.info(`PR #${issue_number}: ${lines} lines -> size:${size}; team=${isTeam}; parked=${park}`);

@@ -1,0 +1,35 @@
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Describe the problem before the solution. A maintainer's "go ahead" here is what makes a pull request worth writing. See CONTRIBUTING.md.
+
+  - type: textarea
+    id: problem
+    attributes:
+      label: What are you trying to do?
+      description: The application or situation, in your own words.
+    validations:
+      required: true
+
+  - type: textarea
+    id: obstacle
+    attributes:
+      label: What gets in your way today?
+      description: What you tried and where it falls short.
+    validations:
+      required: true
+
+  - type: textarea
+    id: proposal
+    attributes:
+      label: What would you want instead? (optional)
+      description: A rough API sketch or example is welcome. A branch you are willing to change is a proposal; finished work is not.
+
+  - type: checkboxes
+    id: impact
+    attributes:
+      label: Does this need changes outside the SDK?
+      options:
+        - label: It changes the register map or Host protocol (needs Shelly Host firmware changes)
+        - label: It needs new or different hardware

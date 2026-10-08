@@ -1,0 +1,32 @@
+needs-hardware-proof:
+  - changed-files:
+      - any-glob-to-any-file:
+          - driver/src/*_stm32.cpp
+          - driver/src/modbus_uart.cpp
+          - driver/src/ui_ws2812.cpp
+          - driver/inc/plc36_memory_map.hpp
+          - variants/**
+          - boards/**
+          - builder/**
+          - tools/plc36_upload.py
+          - tools/upload.py
+
+area:sdk:
+  - changed-files:
+      - any-glob-to-any-file: driver/**
+
+area:examples:
+  - changed-files:
+      - any-glob-to-any-file: examples/**
+
+area:tools:
+  - changed-files:
+      - any-glob-to-any-file: tools/**
+
+area:docs:
+  - changed-files:
+      - any-glob-to-any-file: [docs/**, website/**]
+
+area:ci:
+  - changed-files:
+      - any-glob-to-any-file: [.github/**, .opencode/**]

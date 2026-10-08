@@ -1,0 +1,21 @@
+---
+sidebar_position: 1
+---
+
+import { PropertyTable, PropertyEntry } from '@site/src/components/PropertyTable.jsx';
+
+# API Reference
+
+## Debouncer
+
+<PropertyTable>
+  <PropertyEntry property="Debouncer(settle_ms)" type="constructor">Time in milliseconds the input must hold a new level</PropertyEntry>
+  <PropertyEntry property="update(raw, now_ms)" type="bool">Feeds one raw sample and returns the debounced state</PropertyEntry>
+  <PropertyEntry property="state()" type="bool">Last debounced state</PropertyEntry>
+</PropertyTable>
+
+## Status LED
+
+<PropertyTable>
+  <PropertyEntry property="setStatusLed(on)" type="void">Turns the status LED on or off</PropertyEntry>
+</PropertyTable>

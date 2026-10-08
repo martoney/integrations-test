@@ -1,0 +1,33 @@
+name: stale
+
+on:
+  schedule:
+    - cron: "30 1 * * *"
+  workflow_dispatch:
+
+permissions:
+  issues: write
+  pull-requests: write
+
+jobs:
+  stale:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/stale@4391f3da665fdf50b6810c1a66712fb9ba21aa93 # v11.0.0
+        with:
+          days-before-stale: 28
+          days-before-close: 7
+          stale-issue-label: stale
+          stale-pr-label: stale
+          stale-issue-message: >
+            No activity for 28 days, so this issue is marked stale. It closes in
+            7 days unless someone comments.
+          stale-pr-message: >
+            No activity for 28 days, so this pull request is marked stale. It
+            closes in 7 days unless someone pushes or comments.
+          close-issue-message: Closed after 7 days stale. Comment or reopen if it is still relevant.
+          close-pr-message: Closed after 7 days stale. Reopen if it becomes relevant again.
+          exempt-issue-labels: pinned,security,help wanted,accepted
+          exempt-pr-labels: pinned,security,help wanted
+          remove-stale-when-updated: true
+          operations-per-run: 100
